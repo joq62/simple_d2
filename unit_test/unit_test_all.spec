@@ -1,0 +1,10 @@
+{{service2test,"lib_service"},{src_dir,"/home/pi/erlang/c/source"},
+ {test_module,lib_service_test},{preload,[]}}.
+{{service2test,"dns_service"},{src_dir,"/home/pi/erlang/c/source"},
+ {test_module,dns_service_test},{preload,[]}}.
+{{service2test,"iaas_service"},{src_dir,"/home/pi/erlang/c/source"},
+ {test_module,iaas_service_test},{preload,[]}}.
+{{service2test,"log_service"},{src_dir,"/home/pi/erlang/c/source"},
+ {test_module,log_service_test},{preload,[]}}.
+{{service2test,"catalog_service"},{src_dir,"/home/pi/erlang/c/source"},
+ {test_module,catalog_service_test},{preload,[]}}.

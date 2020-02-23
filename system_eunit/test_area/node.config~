@@ -1,0 +1,12 @@
+
+-define(COMPUTER_MASTER,{"pod_master","localhost",40100,parallell}).
+-define(COMPUTER_LANDET_1,{"pod_landet_1","localhost",40200,parallell}).
+-define(COMPUTER_LGH_1,{"pod_lgh_1","localhost",40300,parallell}).
+-define(COMPUTER_LGH_2,{"pod_lgh_2","localhost",40300,parallell}).
+-define(COMPUTER_LIST,[{pod_master,?COMPUTER__MASTER},{pod_landet_1,?COMPUTER_LANDET_1},
+	{pod_lgh_1,?COMPUTER_LGH_1},
+	{pod_lgh_2,?COMPUTER_LGH_2}]).
+
+-define(SOURCE,{dir,"/home/pi/erlang/simple_d/source"}).
+
+-define(ETS,system_ets).

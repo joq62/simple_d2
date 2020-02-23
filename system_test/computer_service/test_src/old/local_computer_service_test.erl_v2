@@ -1,0 +1,110 @@
+%%% -------------------------------------------------------------------
+%%% Author  : uabjle
+%%% Description : dbase using dets 
+%%%
+%%% Created : 10 dec 2012
+%%% -------------------------------------------------------------------
+-module(local_computer_service_test). 
+    
+%% --------------------------------------------------------------------
+%% Include files
+%% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+% -include("test_src/common_macros.hrl").
+%% --------------------------------------------------------------------
+
+%% External exports
+-export([
+	]).
+     
+%-compile(export_all).
+
+
+
+%% ====================================================================
+%% External functions
+%% ====================================================================
+init_test()->
+    ok=application:set_env([{computer_service,[{computer_ip_address_port,{"localhost",40000}},
+					       {min_vm_port,20010},{max_vm_port,20011},
+					       {type,github},{source,"https://github.com/joq62"}
+					      ]
+			     }
+			   ]),
+    ok=application:start(computer_service),
+    {state,{"localhost",40000},
+     20010,20011,github,
+     "https://github.com/joq62",[],[]}=computer_service:state_info(),
+    Files=["tabort1","tabort2","fil1","fil1"],
+    [os:cmd("rm -r "++File)||File<-Files],
+
+    ok.
+
+init_boot_test()->
+    file:make_dir("tabort1"),
+    file:make_dir("tabort2"),
+    file:open("fil1",[write]),
+    file:open("fil2",[write]),
+    Files=["tabort1","tabort2","fil1","fil1"],
+    [true,true,true,true]=[filelib:is_file(File)||File<-Files],
+    ok.
+
+boot_test()->
+%%------------- Scratch the computer ------------------------------------------  
+  {ok,[{"tabort1",[]},{"fil1",[]},{"fil2",[]},{"tabort2",[]}]}=lib_computer:scratch(),
+
+%%------------- Start Vms --------------------------
+    {state,{IpAddr,Port},
+     VmMinPort,VmMaxPort,
+     Type,Source,[],[]}=computer_service:state_info(),
+
+    {ok,VmStartInfo}=lib_computer:start_vms(VmMinPort,VmMaxPort-VmMinPort,[]),
+    [{'20010_vm@asus',pong},
+     {'20011_vm@asus',pong},
+     {'20012_vm@asus',pong},
+     {'20013_vm@asus',pong},
+     {'20014_vm@asus',pong},
+     {'20015_vm@asus',pong},
+     {'20016_vm@asus',pong},
+     {'20017_vm@asus',pong},
+     {'20018_vm@asus',pong},
+     {'20019_vm@asus',pong}]=[{Vm,net_adm:ping(Vm)}||{_VmId,Vm,_Port}<-VmStartInfo],
+
+%% ------------ Start Services ---------------------------------------------------------
+	
+    glurk=[{VmId,lib_computer:load_start_services(Vm,Type,Source,VmId,[])}||{VmId,Vm,_Port}<-VmStartInfo],
+    ok.
+
+scratch_computer_test()->
+    file:make_dir("tabort1"),
+    file:make_dir("tabort2"),
+    file:open("fil1",[write]),
+    file:open("fil2",[write]),
+    Files=["tabort1","tabort2","fil1","fil1"],
+    [true,true,true,true]=[filelib:is_file(File)||File<-Files],
+    lib_computer:scratch(),
+    [false,false,false,false]=[filelib:is_file(File)||File<-Files],
+   ok.
+    
+    
+
+stop_computer_test()->
+    
+    application:stop(computer_service),
+    application:unload(computer_service),
+    ok.
+
+%%---------------------------------------------------------------------------------
+
+
+stop_test()->
+  %  []=os:cmd("rm -r "++"_service"),
+  %  []=os:cmd("rm -r "++"divi_service"),
+%    ok=pod_service:stop_unload("divi_service"),
+ %   ok=pod_service:stop_unload("adder_service"),
+  %  ok=pod_service:stop_unload("log_service"),
+  %  application:stop(pod_service),
+    kill().
+
+kill()->
+    init:stop().
